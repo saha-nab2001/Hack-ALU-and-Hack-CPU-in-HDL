@@ -1,0 +1,9 @@
+//This chip performs OR operation with fan-in parameter 4
+CHIP FourFanInOr {
+	IN a, b, c, d;
+	OUT out;
+	PARTS:
+	Or(a=a, b=b, out=aorb);
+	Or(a=c, b=d, out=cord);
+	Or(a=aorb, b=cord, out=out);
+}

@@ -1,0 +1,22 @@
+//This chip is an utility chip of a 16 bit CLA based adder
+CHIP PAndGAdder {
+  IN X[16], Y[16], P[16], G[16], as;
+  OUT C[16], S[16], ofsigned, ofunsigned;
+  PARTS:
+  FourBitCLAAdder(X=X[0..3], Y=Y[0..3], c0=as, P=P[0..3], G=G[0..3], S=S[0..3], C=C1);
+  Copy4(in=C1, out=C[0..3]);
+  Copy4To1(in=C1, out=c1);
+	FourBitCLAAdder(X=X[4..7], Y=Y[4..7], c0=c1, P=P[4..7], G=G[4..7], S=S[4..7], C=C2);
+  Copy4(in=C2, out=C[4..7]);
+  Copy4To1(in=C2, out=c2);
+	FourBitCLAAdder(X=X[8..11], Y=Y[8..11], c0=c2, P=P[8..11], G=G[8..11], S=S[8..11], C=C3);
+  Copy4(in=C3, out=C[8..11]);
+  Copy4To1(in=C3, out=c3);
+	FourBitCLAAdder(X=X[12..15], Y=Y[12..15], c0=c3, P=P[12..15], G=G[12..15], S=S[12..15], C=C4);
+  Copy4(in=C4, out=C[12..15]);
+  Copy4To1(in=C4, out=c16);
+  Copy4To13(in=C4, out=c15);
+	Xor(a=c16, b=c15, out=ofsigned);
+	Xor(a=c16, b=as, out=ofunsigned);
+
+}

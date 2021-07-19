@@ -1,0 +1,7 @@
+//This chip extracts the MSB of a 4 bit bus
+CHIP Copy4To1 {
+  IN in[4];
+  OUT out;
+  PARTS:
+  And(a=in[3], b=in[3], out=out);
+}

@@ -1,0 +1,8 @@
+//This chip performs AND operation with fan-in parameter 3
+CHIP ThreeFanInAnd {
+	IN a, b, c;
+	OUT out;
+	PARTS:
+	And(a=a, b=b, out=ab);
+	And(a=c, b=ab, out=out);
+}

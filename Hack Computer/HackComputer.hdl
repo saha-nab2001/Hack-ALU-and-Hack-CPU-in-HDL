@@ -1,0 +1,12 @@
+//This is the main hack computer chip
+
+CHIP HackComputer {
+
+    IN reset;
+
+    PARTS:
+
+    ROM32K(address=pc, out=instruction);       // Loads the ROM for stroring instructions
+    HackCPU(inM=inM, instruction=instruction, reset=reset, outM=outM, writeM=writeM, addressM=addressM, pc=pc); // Loads the main Hack CPU unit
+    Memory(in=outM, load=writeM, address=addressM, out=inM); // Loads the 64*16bit RAM
+}

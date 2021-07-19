@@ -1,0 +1,13 @@
+//This chip generates the zr and ng bits
+CHIP ZRAndNGGenerator {
+ IN in[16];
+ OUT zr, ng;
+ PARTS:
+ FourFanInOr(a=in[0], b=in[1], c=in[2], d=in[3], out=in1);
+ FourFanInOr(a=in[4], b=in[5], c=in[6], d=in[7], out=in2);
+ FourFanInOr(a=in[8], b=in[9], c=in[10], d=in[11], out=in3);
+ FourFanInOr(a=in[12], b=in[13], c=in[14], d=in[15], out=in4);
+ FourFanInOr(a=in1, b=in2, c=in3, d=in4, out=notzr);
+ Not(in=notzr, out=zr);
+ And(a=in[15], b=in[15], out=ng);
+}

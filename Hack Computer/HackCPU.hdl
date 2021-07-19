@@ -1,0 +1,85 @@
+/**
+ * The Hack CPU (Central Processing unit), consisting of an ALU,
+ * two registers named A and D, and a program counter named PC.
+ * The CPU is designed to fetch and execute instructions written in
+ * the Hack machine language. In particular, functions as follows:
+ * Executes the inputted instruction according to the Hack machine
+ * language specification. The D and A in the language specification
+ * refer to CPU-resident registers, while M refers to the external
+ * memory location addressed by A, i.e. to Memory[A]. The inM input
+ * holds the value of this location. If the current instruction needs
+ * to write a value to M, the value is placed in outM, the address
+ * of the target location is placed in the addressM output, and the
+ * writeM control bit is asserted. (When writeM==0, any value may
+ * appear in outM). The outM and writeM outputs are combinational:
+ * they are affected instantaneously by the execution of the current
+ * instruction. The addressM and pc outputs are clocked: although they
+ * are affected by the execution of the current instruction, they commit
+ * to their new values only in the next time step. If reset==1 then the
+ * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather
+ * than to the address resulting from executing the current instruction.
+ */
+
+CHIP HackCPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M?
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+
+    Not(in=instruction[15], out=NOTI15);
+
+    // writeA = notI15 + I15.I5 = notI15 + I5 (Elimination theorem)
+    Or(a=NOTI15, b=instruction[5], out=writeA);
+
+    // writeD = I15.I4
+    And(a=instruction[15], b=instruction[4], out=writeD);
+
+    // MUX 1
+    // Select line s = notI15
+    MUX16Bit2To1(a= outALU, b= instruction, s=NOTI15, out=inA);
+
+    // A Register
+    ARegister(in=inA, load=writeA, out= outA, out[0..14] = addressM);
+
+    // MUX 2
+    // Select line s = I15.I12
+    And(a=instruction[15], b=instruction[12], out= I15I12);
+    MUX16Bit2To1(a=outA, b=inM, s=I15I12, out= y);
+
+    // Hack ALU
+    HackALU(x=x, y=y, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], n0=instruction[6] ,out=outM, out=outALU, zr=zr,ng=ng);
+
+    // D Register
+    DRegister(in=outALU, load=writeD, out=x);
+
+    // JEQ = I15.I1.zr
+    ThreeFanInAnd(a=instruction[1], b=instruction[15], c=zr, out=I15I1zr);
+
+    // JLT = I15.I2.ng
+    ThreeFanInAnd(a=instruction[2], b=instruction[15], c=ng, out=I15I2ng);
+
+    // JGT = I15.I0.notzr.notng
+    Not(in=zr, out=NOTzr);
+    Not(in=ng, out=NOTng);
+    FourFanInAnd(a=NOTzr, b=NOTng, c=instruction[0], d=instruction[15], out= I15I0notzrnotng);
+
+    // writeM = I15.I3
+    And(a=instruction[15], b=instruction[3], out=writeM);
+
+    // JMP = JEQ + JLT + JGT
+    ThreeFanInOr(a=I15I2ng, b=I15I1zr, c=I15I0notzrnotng, out=jump);
+
+    // Update PC
+    Not(in=jump, out=inc);
+    PC(in=outA,load=jump,inc=inc,reset=reset,out[0..14]=pc);
+
+}

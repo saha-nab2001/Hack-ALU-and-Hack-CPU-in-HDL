@@ -1,0 +1,13 @@
+//This chip performs function of a full adder circuit
+CHIP FullAdder{
+	IN x, y, c0;
+	OUT out, c1;
+	PARTS:
+	And(a=x, b=y, out=xy);
+	And(a=x, b=c0, out=xc0);
+	And(a=y, b=c0, out=yc0);
+	Xor(a=x, b=y, out=xxory);
+	Xor(a=xxory, b=c0, out=out);
+	Or(a=xy, b=xc0, out=xyxc0);
+	Or(a=xyxc0, b=yc0, out=c1);
+}

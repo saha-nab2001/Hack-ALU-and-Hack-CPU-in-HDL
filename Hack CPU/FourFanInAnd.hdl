@@ -1,0 +1,9 @@
+//This chip performs AND operation with fan-in parameter 4
+CHIP FourFanInAnd {
+	IN a, b, c, d;
+	OUT out;
+	PARTS:
+	And(a=a, b=b, out=ab);
+	And(a=c, b=d, out=cd);
+	And(a=ab, b=cd, out=out);
+}

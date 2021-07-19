@@ -1,0 +1,7 @@
+//This chip extracts the third bit from the left of a 4 bit bus
+CHIP Copy4To13 {
+  IN in[4];
+  OUT out;
+  PARTS:
+  And(a=in[2], b=in[2], out=out);
+}

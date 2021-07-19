@@ -1,0 +1,18 @@
+//Main Hack ALU chip
+CHIP HackALU {
+  IN x[16], y[16], zx, nx, zy, ny, f, n0;
+  OUT out[16], zr, ng;
+  PARTS:
+  Xor(a=zx, b=zx, out=zero);
+  Zero16Bit(in=x, out = zero16bit);
+  MUX16Bit2To1(a=x, b=zero16bit, s=zx, out=x1);
+  MUX16Bit2To1(a=y, b=zero16bit, s=zy, out=y1);
+  Xor16and1(a=x1, b=nx, out=p);
+  Xor16and1(a=y1, b=ny, out=q);
+  SixteenBitAdder(X=p, Y=q, as=zero, S=pPLUSq);
+  And16(a=p, b=q, out=pANDq);
+  MUX16Bit2To1(a=pANDq, b=pPLUSq, s=f, out=r);
+  Xor16and1(a=r, b=n0, out=inter);
+  ZRAndNGGenerator(in=inter, zr=zr, ng=ng);
+  Copy16(in=inter, out=out);
+}

@@ -1,0 +1,10 @@
+//This chip performs 16 bit addition CLA based addition using higher level propagate and generate terms
+CHIP SixteenBitAdder {
+	IN X[16], Y[16], as;
+	OUT C[16], S[16], ofsigned, ofunsigned;
+	PARTS:
+	Xor16and1(a=Y, b=as, out=Z);
+	Xor16(a=X, b=Z, out=P);
+	And16(a=X, b=Z, out=G);
+	PAndGAdder(X=X, Y=Y, P=P, G=G, as=as, C=C, S=S, ofsigned=ofsigned, ofunsigned=ofunsigned);
+}
